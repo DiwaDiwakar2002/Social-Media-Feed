@@ -1,3 +1,5 @@
+/* cspell:disable */
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -5,7 +7,13 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: "#036ec2",
+
+      }
+    },
   },
   plugins: [],
 }
+

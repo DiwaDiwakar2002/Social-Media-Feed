@@ -1,8 +1,20 @@
 // controllers/post.controller.js
 const fs = require('fs');
 const Post = require('../Models/post.model');
+const jwt = require('jsonwebtoken');
 
-// Upload files to upload folder
+const jwtSecret = 'c49w84d9c84w9dc8wdc7';
+
+const getPosts = async (req, res) => {
+    try {
+        const posts = await Post.find().populate('user', 'name');
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const uploadFile = async (req, res) => {
     try {
         const uploadedFiles = [];
@@ -21,38 +33,87 @@ const uploadFile = async (req, res) => {
     }
 };
 
-// Create a new post
 const createPost = async (req, res) => {
     try {
+        const { token } = req.cookies;
         const { content, photos } = req.body;
-        const user = req.user;  // User is already verified by middleware
 
-        const postDoc = await Post.create({
-            user: user.id,
-            content,
-            photos,
+        jwt.verify(token, jwtSecret, async (err, user) => {
+            if (err) return res.status(401).json({ message: 'Unauthorized' });
+            const postDoc = await Post.create({
+                user: user.id,
+                content,
+                photos,
+            });
+            res.status(200).json(postDoc);
         });
-
-        res.status(200).json(postDoc);
     } catch (error) {
         console.error('Error creating post:', error);
         res.status(500).json({ message: error.message });
     }
 };
 
-const getPost = async (req, res)=>{
+
+const postComments = async (req, res) => {
     try {
-        const postDoc = await Post.find()
-        res.status(200).json(postDoc)
-        
+        const { postId } = req.params;
+        const commentVO = req.body;
+
+        const post = await Post.findById(postId);
+        if (!post) {
+            return res.status(404).json({ message: ` Post not found ${postId}` });
+        }
+        post.comment.push(commentVO);
+        await post.save(); // Save the updated post
+        res.status(200).json({ message: "Comment added successfully", post });
     } catch (error) {
-        console.error('Error getting post:', error);
+        console.error('Error posting comment:', error);
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// like
+
+const postLike = async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const { userId } = req.body;
+        const postVO = await Post.findById(postId)
+        const tempLikes = postVO.likes ?? [];
+        const index = tempLikes.indexOf(userId);
+        if (index > -1) {
+            tempLikes.splice(tempLikes, 1);
+        } else {
+            tempLikes.push(userId);
+        }
+        await postVO.save();
+        res.status(200).json({ message: index > -1 ? "Removed" : "Comment added successfully", postVO });
+    } catch (error) {
+        console.error('Error liking comment:', error);
         res.status(500).json({ message: error.message });
     }
 }
 
+const getPostsById = async (req, res) =>{
+    try {
+        const {id} = req.params
+        const post = await Post.find({"user":id})
+        if (!post) {
+            return res.status(404).json({ message: ` Post not found ${id}`})
+            }
+            res.status(200).json({message: "Post found", post})
+    } catch (error) {
+        console.error('Error getting post by id:', error);
+        res.status(500).json({ message: error.message });
+    }
+}
+
+
 module.exports = {
     uploadFile,
     createPost,
-    getPost
+    getPosts,
+    postComments,
+    postLike,
+    getPostsById
 };

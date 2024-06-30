@@ -3,21 +3,19 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 
 const RegisterPage = () => {
-  // state for form data
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
 
-  //   store formdata to state
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // send formdata to backend
   const handleSubmit = async (e) => {
+    console.log("FE : ",formData)
     e.preventDefault();
     try {
       const res = await axios.post("/register", {
@@ -28,7 +26,7 @@ const RegisterPage = () => {
       console.log(res);
       alert("Registration Successful :)");
     } catch (error) {
-      console.log(error);
+      console.error("Registration Error:", error);
       alert("Registration Failed :(");
     }
   };
@@ -36,13 +34,13 @@ const RegisterPage = () => {
   return (
     <>
       <div className="mt-4 grow flex items-center justify-around">
-        <div className="mb-32">
+        <div className="mb-32 bg-white py-6 px-5 w-max rounded-lg mx-auto mt-28 shadow-lg">
           <h1 className="text-4xl text-center mb-5">Register</h1>
           <form className="max-w-md mx-auto" onSubmit={handleSubmit}>
             <input
               required
               type="text"
-              placeholder="your name"
+              placeholder="Your name"
               value={formData.name}
               name="name"
               onChange={handleChange}
@@ -50,7 +48,7 @@ const RegisterPage = () => {
             <input
               required
               type="email"
-              placeholder="your@gmail.com"
+              placeholder="Your email"
               value={formData.email}
               name="email"
               onChange={handleChange}
@@ -58,12 +56,12 @@ const RegisterPage = () => {
             <input
               required
               type="password"
-              placeholder="password"
+              placeholder="Password"
               value={formData.password}
               name="password"
               onChange={handleChange}
             />
-            <button className="primary">Register</button>
+            <button className="bg-primary text-white px-3 py-2 w-full rounded-md mt-2">Register</button>
             <div className="text-center text-gray-500 py-2">
               Have an account?{" "}
               <Link to={"/login"} className="text-primary underline">

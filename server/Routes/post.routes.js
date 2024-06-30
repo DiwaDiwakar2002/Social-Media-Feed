@@ -2,15 +2,22 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const { uploadFile, createPost, getPost } = require("../Controller/post.controller");
-const authenticateToken = require("../Middleware/authenticateToken.js");
+const { uploadFile, createPost, getPosts, postComments, postLike, getPostsById } = require("../Controller/post.controller");
+const authenticateToken = require('../middleware/authenticateToken');
 
-// Create a multer instance for file uploads
 const photoMiddleware = multer({ dest: 'uploads/' });
 
+router.get("/post", getPosts);
 router.post("/upload", photoMiddleware.array('photos', 100), uploadFile);
 router.post("/userpost", authenticateToken, createPost);
 
-// get all post
-router.get('/post', getPost)
+// get post by Id
+router.get("/post-data/:id", getPostsById);
+// comment
+router.post("/add-comments/:postId", postComments)
+
+// like
+router.post("/post-like/:postId", postLike )
+
+
 module.exports = router;

@@ -6,6 +6,7 @@ export const Context = createContext()
 const UserContext = ({children}) => {
     const [user, setUser] = useState(null)
     const [ready, setReady] = useState(false)
+    const [fetching, setFetching] = useState(0)
 
     useEffect(()=>{
         if(!user){
@@ -16,7 +17,7 @@ const UserContext = ({children}) => {
         }
     })
   return (
-    <Context.Provider value={{user, setUser, ready, setReady}}>
+    <Context.Provider value={{user, setUser, ready, setReady, fetching, setFetching}}>
         {children}
     </Context.Provider>
   )

@@ -43,8 +43,8 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="mt-4 grow flex items-center justify-around">
-      <div className="mb-32">
+    <div className="mt-4 grow ">
+      <div className="mb-32 bg-white py-6 px-5 w-max rounded-lg mx-auto mt-28 shadow-lg">
         <h1 className="text-4xl text-center mb-5">Login</h1>
         <form className="max-w-md mx-auto" onSubmit={handleSubmit}>
           <input
@@ -63,7 +63,7 @@ const LoginPage = () => {
             value={loginData.password}
             onChange={handleChange}
           />
-          <button className="primary">Login</button>
+          <button className="bg-primary text-white px-3 py-2 w-full rounded-md mt-2">Login</button>
           <div className="text-center text-gray-500 py-2">
             Don't have an account yet?{" "}
             <Link to={"/register"} className="text-primary underline">

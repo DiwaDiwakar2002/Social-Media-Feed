@@ -8,6 +8,7 @@ input[type="email"],
 input[type="number"],
 input[type="password"],
 input[type="tel"],
+select,
 textarea{
     @apply w-full border my-2 px-3 py-2 rounded-md;
 }
@@ -20,9 +21,10 @@ button{
     @apply bg-gray-300;
 }
 
+
 button.primary{
     background: linear-gradient(90deg, rgba(7,0,128,1) 0%, rgba(0,212,255,1) 100%);
-    @apply bg-primary p-2 w-full text-white rounded-md;
+    @apply bg-primary p-2 text-white rounded-md;
 }
 
 a.primary{

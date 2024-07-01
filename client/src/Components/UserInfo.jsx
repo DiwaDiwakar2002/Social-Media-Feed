@@ -2,10 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../UserContext";
 import axios from "axios";
 
+// Component to display user information and handle logout
 const UserInfo = () => {
-  const { setUser, setAccountRedirect } = useContext(Context);
-  const [userData, setUserData] = useState([]);
+  const { setUser, setAccountRedirect } = useContext(Context); // Access the context for user and account redirect
+  const [userData, setUserData] = useState([]); // State to hold user data
 
+  // useEffect to fetch user data on component mount
   useEffect(() => {
     try {
       const fetchData = async () => {
@@ -14,27 +16,28 @@ const UserInfo = () => {
       };
       fetchData();
     } catch (error) {
-      console.error("error in fetching userInfo");
+      console.error("Error in fetching userInfo", error);
     }
   }, []);
 
+  // Function to handle user logout
   const handleLogout = async () => {
     await axios.post("/logout");
-    setAccountRedirect('/');
-    setUser(null);
+    setAccountRedirect('/'); // Redirect to home page after logout
+    setUser(null); // Clear the user context
   };
-
- 
 
   return (
     <div className="flex items-center justify-between lg:gap-5 gap-3 bg-white py-5 px-7 rounded-lg">
       <div className="flex gap-2">
-
-      <div className="my-auto">
-        <h2 className="font-bold text-2xl">{userData.name}</h2>
-        <p className="text-sm text-gray-600">{userData.email}</p>
+        <div className="my-auto">
+          {/* Display user name */}
+          <h2 className="font-bold text-2xl">{userData.name}</h2>
+          {/* Display user email */}
+          <p className="text-sm text-gray-600">{userData.email}</p>
+        </div>
       </div>
-      </div>
+      {/* Logout button */}
       <button
         className="flex gap-2 items-center pe-4 bg-primary font-medium px-3 py-1 rounded-md text-white max-w-sm mt-2"
         onClick={handleLogout}

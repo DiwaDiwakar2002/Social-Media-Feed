@@ -10,11 +10,13 @@ const RegisterPage = () => {
     password: "",
   });
 
+  // store the data to useState
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  // posting new user
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

@@ -1,18 +1,22 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const AddNewPost = ({fetchPosts}) => {
+// Component for adding a new post
+const AddNewPost = ({ fetchPosts }) => {
   const [addedPhotos, setAddedPhotos] = useState([]);
   const [content, setContent] = useState("");
 
+  // Function to handle photo uploads
   const uploadPhoto = (e) => {
     const files = e.target.files;
     const data = new FormData();
 
+    // Append each selected file to the FormData object
     for (let i = 0; i < files.length; i++) {
       data.append("photos", files[i]);
     }
 
+    // Send the FormData to the server
     axios
       .post("/upload", data, {
         headers: {
@@ -22,6 +26,7 @@ const AddNewPost = ({fetchPosts}) => {
       })
       .then((res) => {
         const { data: fileNames } = res;
+        // Update the addedPhotos state with the file names
         setAddedPhotos((prev) => [...prev, ...fileNames]);
       })
       .catch((error) => {
@@ -29,10 +34,11 @@ const AddNewPost = ({fetchPosts}) => {
       });
   };
 
+  // Function to handle the post submission
   const handlePost = async (e) => {
     e.preventDefault();
     try {
-     await axios.post(
+      await axios.post(
         "/userpost",
         {
           content,
@@ -46,7 +52,7 @@ const AddNewPost = ({fetchPosts}) => {
       // Clear input fields after successful post
       setContent("");
       setAddedPhotos([]);
-      fetchPosts()
+      fetchPosts(); // Fetch posts to update the feed
     } catch (error) {
       console.error("Error in posting", error);
     }

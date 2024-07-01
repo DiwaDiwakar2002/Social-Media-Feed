@@ -11,6 +11,7 @@ const FeedPage = () => {
   const [sortOption, setSortOption] = useState("latest");
   const { user } = useContext(Context);
 
+  // fetching post 
   const fetchPosts = async () => {
     try {
       const { data } = await axios.get("/post");
@@ -24,10 +25,12 @@ const FeedPage = () => {
       fetchPosts();
   }, []);
 
+  // toggle for comment icon
   const handleToggleCommentInput = (postId) => {
     setCommentingPostId(postId === commentingPostId ? null : postId);
   };
 
+  // posting comment to backend
   const handleComment = async (postId) => {
     if (!newComment) return;
 
@@ -55,6 +58,7 @@ const FeedPage = () => {
     }
   };
 
+  // like functionality
   const handleLike = async (postId) => {
     const isLiked = posts.find((post) => post._id === postId).likes.includes(user.id);
 
@@ -88,7 +92,7 @@ const FeedPage = () => {
   };
 
 
-
+// sorting post
   const handleSortChange = (e) => {
     setSortOption(e.target.value);
   };

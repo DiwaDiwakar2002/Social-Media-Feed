@@ -2,21 +2,25 @@ import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../UserContext";
 
+// Header component to display the navigation bar
 const Header = () => {
-  const { user } = useContext(Context);
+  const { user } = useContext(Context); // Access the user context
 
   return (
     <header className="flex justify-between">
+      {/* Link to the home page */}
       <Link
         to={"/home"}
-        href=""
         className="flex items-center gap-1 text-primary"
       >
         <span className="font-bold text-3xl">insta</span>
       </Link>
+
+      {/* Link to the account page */}
       <Link to={"/account"}
         className="flex items-center gap-2 primary rounded-md py-2 px-4 text-white font-semibold"
       >
+        {/* User avatar icon */}
         <div className="bg-primary text-white rounded-full border overflow-hidden">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -31,6 +35,7 @@ const Header = () => {
             />
           </svg>
         </div>
+        {/* Display the user's name if the user is logged in */}
         {!!user && <div>{user.name}</div>}
       </Link>
     </header>

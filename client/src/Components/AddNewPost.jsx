@@ -1,11 +1,9 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { Context } from "../UserContext";
 
-const AddNewPost = () => {
+const AddNewPost = ({fetchPosts}) => {
   const [addedPhotos, setAddedPhotos] = useState([]);
   const [content, setContent] = useState("");
-  const { setFetching, fetching } = useContext(Context);
 
   const uploadPhoto = (e) => {
     const files = e.target.files;
@@ -41,7 +39,7 @@ const AddNewPost = () => {
           photos: addedPhotos,
         },
         {
-          withCredentials: true, // Include credentials (cookies)
+          withCredentials: true,
         }
       );
       console.log("Post created successfully:", res.data);
@@ -49,7 +47,7 @@ const AddNewPost = () => {
       // Clear input fields after successful post
       setContent("");
       setAddedPhotos([]);
-      setFetching((fetching) => fetching + 1);
+      fetchPosts()
     } catch (error) {
       console.error("Error in posting", error);
     }
@@ -84,8 +82,8 @@ const AddNewPost = () => {
               </div>
             ))}
         </div>
-        <div className="flex justify-between">
-          <label className="flex cursor-pointer border text-center border-primary bg-transparent rounded-md px-5 py-2 text-primary gap-1 font-medium">
+        <div className="flex justify-between gap-2">
+          <label className="flex justify-center w-full cursor-pointer border text-center border-primary bg-transparent rounded-md px-5 py-2 text-primary gap-1 font-medium">
             <input
               type="file"
               multiple

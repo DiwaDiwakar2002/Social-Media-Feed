@@ -78,16 +78,17 @@ const postLike = async (req, res) => {
     try {
         const { postId } = req.params;
         const { userId } = req.body;
-        const postVO = await Post.findById(postId)
+        const postVO = await Post.findById(postId).populate('user');
         const tempLikes = postVO.likes ?? [];
         const index = tempLikes.indexOf(userId);
         if (index > -1) {
-            tempLikes.splice(tempLikes, 1);
+            tempLikes.splice(index, 1);
         } else {
             tempLikes.push(userId);
         }
         await postVO.save();
-        res.status(200).json({ message: index > -1 ? "Removed" : "Comment added successfully", postVO });
+        const updatedPost = await Post.findById(postId).populate('user'); // Re-populate user field
+        res.status(200).json({ message: index > -1 ? "Removed" : "Comment added successfully", postVO: updatedPost });
     } catch (error) {
         console.error('Error liking comment:', error);
         res.status(500).json({ message: error.message });
@@ -108,6 +109,18 @@ const getPostsById = async (req, res) =>{
     }
 }
 
+const deletePostById = async (req, res) => {
+    try {
+        const {id} = req.params
+        console.log(id)
+        await Post.findByIdAndDelete(id)
+        res.status(200).json("post deleted successfully")
+    } catch (error) {
+        console.error('Error deleting post by id:', error);
+        res.status(500).json({ message: error.message });
+    }
+}
+
 
 module.exports = {
     uploadFile,
@@ -115,5 +128,6 @@ module.exports = {
     getPosts,
     postComments,
     postLike,
-    getPostsById
+    getPostsById,
+    deletePostById
 };

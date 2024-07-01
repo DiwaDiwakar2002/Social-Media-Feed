@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const { uploadFile, createPost, getPosts, postComments, postLike, getPostsById } = require("../Controller/post.controller");
+const { uploadFile, createPost, getPosts, postComments, postLike, getPostsById, deletePostById } = require("../Controller/post.controller");
 const authenticateToken = require('../middleware/authenticateToken');
 
 const photoMiddleware = multer({ dest: 'uploads/' });
@@ -18,6 +18,9 @@ router.post("/add-comments/:postId", postComments)
 
 // like
 router.post("/post-like/:postId", postLike )
+
+// delete post
+router.delete("/post-delete/:id", deletePostById)
 
 
 module.exports = router;

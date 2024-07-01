@@ -17,16 +17,12 @@ textarea{
     height: 150px;
 }
 
-button{
-    @apply bg-gray-300;
-}
-
 
 button.primary{
-    background: linear-gradient(90deg, rgba(7,0,128,1) 0%, rgba(0,212,255,1) 100%);
-    @apply bg-primary p-2 text-white rounded-md;
+    @apply bg-primary text-white px-3 py-2 font-medium rounded-md mt-2;
 }
 
 a.primary{
     background: #036ec2;
 }
+

@@ -1,12 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../UserContext";
 import axios from "axios";
-import { Navigate } from "react-router-dom";
 
 const UserInfo = () => {
-  const { user, setUser } = useContext(Context);
+  const { setUser, setAccountRedirect } = useContext(Context);
   const [userData, setUserData] = useState([]);
-  const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
     try {
@@ -22,29 +20,28 @@ const UserInfo = () => {
 
   const handleLogout = async () => {
     await axios.post("/logout");
+    setAccountRedirect('/');
     setUser(null);
-    setRedirect(true);
   };
 
-  if (redirect) {
-    return <Navigate to={"/"} />;
-  }
+ 
 
   return (
-    <div className="flex items-center justify-center lg:gap-5 gap-3 bg-white max-w-fit py-5 px-7 rounded-lg">
-      <div className="">
+    <div className="flex items-center justify-between lg:gap-5 gap-3 bg-white py-5 px-7 rounded-lg">
+      <div className="flex gap-2">
         <img
           src={userData.profilePath}
           alt="profile-img"
           className="w-16 h-16 rounded-full bg-gray-500"
         />
-      </div>
-      <div className="">
+
+      <div className="my-auto">
         <h2 className="font-bold text-2xl">{userData.name}</h2>
         <p className="text-sm text-gray-600">{userData.email}</p>
       </div>
+      </div>
       <button
-        className="flex gap-2 items-center pe-4 bg-primary font-medium px-3 py-1 rounded-md w-full text-white max-w-sm mt-2"
+        className="flex gap-2 items-center pe-4 bg-primary font-medium px-3 py-1 rounded-md text-white max-w-sm mt-2"
         onClick={handleLogout}
       >
         <svg

@@ -7,11 +7,11 @@ const Header = () => {
 
   return (
     <header className="flex justify-between">
-      <Link to={"/"} href="" className="flex items-center gap-1 text-primary">
+      <Link to={"/home"} href="" className="flex items-center gap-1 text-primary">
         <span className="font-bold text-3xl">insta</span>
       </Link>
       <Link
-        to={user ? "/account" : "/login"}
+        to={user ? "/account" : "/"}
         className="flex items-center gap-2 primary rounded-md py-2 px-4 text-white font-semibold"
       >
         <div className="bg-primary text-white rounded-full border overflow-hidden">

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const RegisterPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -15,16 +16,16 @@ const RegisterPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    console.log("FE : ",formData)
+    console.log("FE : ", formData);
     e.preventDefault();
     try {
-      const res = await axios.post("/register", {
+      await axios.post("/register", {
         name: formData.name,
         email: formData.email,
         password: formData.password,
       });
-      console.log(res);
       alert("Registration Successful :)");
+      navigate("/");
     } catch (error) {
       console.error("Registration Error:", error);
       alert("Registration Failed :(");
@@ -61,10 +62,12 @@ const RegisterPage = () => {
               name="password"
               onChange={handleChange}
             />
-            <button className="bg-primary text-white px-3 py-2 w-full rounded-md mt-2">Register</button>
+            <button className="bg-primary text-white px-3 py-2 w-full rounded-md mt-2">
+              Register
+            </button>
             <div className="text-center text-gray-500 py-2">
               Have an account?{" "}
-              <Link to={"/login"} className="text-primary underline">
+              <Link to={"/"} className="text-primary underline">
                 Login
               </Link>
             </div>

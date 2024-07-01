@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { format, formatDistanceToNow, parseISO } from "date-fns";
+import { formatDistanceToNow, parseISO } from "date-fns";
 import { Context } from "../UserContext";
 
 const UserPosts = () => {
@@ -9,7 +9,7 @@ const UserPosts = () => {
   const [commentingPostId, setCommentingPostId] = useState(null); // Track post id for comment input
   const [likedPosts, setLikedPosts] = useState(new Set()); // Track liked posts
   const [sortOption, setSortOption] = useState("default"); // Track selected sort option
-  const { user } = useContext(Context);
+  const { user, ready } = useContext(Context);
 
   const handleToggleCommentInput = (postId) => {
     setCommentingPostId(postId === commentingPostId ? null : postId);
@@ -44,10 +44,6 @@ const UserPosts = () => {
 
   const handleLike = async (postId) => {
     try {
-      const payload = {
-        userId: user.email,
-      };
-
       const isLiked = likedPosts.has(postId);
       const updatedLikedPosts = new Set(likedPosts);
 
@@ -77,14 +73,15 @@ const UserPosts = () => {
     }
   };
 
+  const fetchPosts = async () => {
+    const { data } = await axios.get("/user-data");
+    const postDoc = await axios.get(`/post-data/${data._id}`);
+    setPosts(postDoc.data.post); // Assuming postDoc.data is the single post object
+  };
+
   useEffect(() => {
     try {
-      const fetchData = async () => {
-        const { data } = await axios.get("/user-data");
-        const postDoc = await axios.get(`/post-data/${data._id}`);
-        setPosts(postDoc.data.post); // Assuming postDoc.data is the single post object
-      };
-      fetchData();
+      fetchPosts();
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
@@ -116,10 +113,20 @@ const UserPosts = () => {
 
   const sortedPosts = sortPosts(posts, sortOption);
 
-  const formatDate = (dateString) => {
-    const date = parseISO(dateString);
-    return format(date, "dd/MMMM/yyyy");
+  const handlePostDelete = async (id) => {
+    const isConfirmed = confirm("Are you sure you want to delete?");
+
+    if (!isConfirmed) {
+      return;
+    }
+    try {
+      await axios.delete(`/post-delete/${id}`);
+      fetchPosts();
+    } catch (error) {
+      console.error("error in deleting post", error);
+    }
   };
+
 
   return (
     <section className="flex flex-col mt-10">
@@ -129,7 +136,7 @@ const UserPosts = () => {
             <h1 className="text-3xl font-medium mb-2">My Posts</h1>
           </div>
 
-          <div >
+          <div>
             <select
               value={sortOption}
               onChange={handleSortChange}
@@ -143,16 +150,45 @@ const UserPosts = () => {
             </select>
           </div>
         </div>
-        {/* <h1 className="text-3xl font-medium">Feed</h1> */}
         <div className="w-full max-w-5xl mx-auto gap-5 columns-1 md:columns-2 lg:columns-3 space-y-5">
-          {sortedPosts.map((post, index) => (
+        {sortedPosts.length == 0 ? (
+            <div className="">
+              <div class="animate-pulse flex flex-col items-center justify-center gap-4 w-60">
+                <div>
+                  <div class="w-48 h-6 bg-slate-400 rounded-md"></div>
+                  <div class="w-28 h-4 bg-slate-400 mx-auto mt-3 rounded-md"></div>
+                </div>
+                <div class="h-7 bg-slate-400 w-full rounded-md"></div>
+                <div class="h-7 bg-slate-400 w-full rounded-md"></div>
+                <div class="h-7 bg-slate-400 w-full rounded-md"></div>
+                <div class="h-7 bg-slate-400 w-1/2 rounded-md"></div>
+              </div>
+      
+            </div>
+          ) : (
+          sortedPosts.map((post, index) => (
             <div
               key={index}
               className="w-full flex flex-col gap-4 p-4 bg-white rounded-lg shadow-md break-inside-avoid"
             >
-              <h2 className="font-bold text-xl my-1">
-                {user.name}
-              </h2>
+              <div className="flex justify-between">
+                <h2 className="font-semibold text-xl my-1">{user.name}</h2>
+                <button onClick={() => handlePostDelete(post._id)}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="size-6 text-red-600"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              </div>
+
               <div className="overflow-hidden object-cover rounded-lg">
                 {post.photos.length > 0 && (
                   <img
@@ -169,7 +205,16 @@ const UserPosts = () => {
                     className="bg-transparent"
                     onClick={() => handleLike(post._id)}
                   >
-                    {likedPosts.has(post._id) ? (
+                    {post.likes.includes(post.user._id) ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="size-6 text-primary"
+                      >
+                        <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
+                      </svg>
+                    ) : (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -184,21 +229,12 @@ const UserPosts = () => {
                           d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
                         />
                       </svg>
-                    ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="size-6 text-primary"
-                      >
-                        <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z" />
-                      </svg>
                     )}
                   </button>
                   <span>{post.likes.length} Likes</span>
                 </div>
                 <div
-                  className="ml-4 cursor-pointer"
+                  className="ml-4 flex flex-col cursor-pointer"
                   onClick={() => handleToggleCommentInput(post._id)}
                 >
                   <svg
@@ -212,51 +248,59 @@ const UserPosts = () => {
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z"
+                      d="M12 20.25c4.97 0 9-3.148 9-7.032 0-3.882-4.03-7.03-9-7.03-4.97 0-9 3.148-9 7.03 0 1.735.693 3.34 1.852 4.578-.47 1.588-1.678 2.678-1.805 2.78a.348.348 0 0 0 .207.624c.702 0 2.61-.177 4.32-1.303A10.937 10.937 0 0 0 12 20.25z"
                     />
                   </svg>
-                  <span className="ml-1">{post.comment.length} Comments</span>
+                  <span>{post.comment.length} Comments</span>
                 </div>
               </div>
-              <p className="text-sm text-gray-600">
-                {formatDate(post.createdAt)}
-              </p>
+              <small className="text-gray-600">
+                {formatDistanceToNow(parseISO(post.createdAt))} ago
+              </small>
               {commentingPostId === post._id && (
                 <div>
-                  <div className="mt-2">
+                  <div className="flex">
                     <input
                       type="text"
                       value={newComment}
                       onChange={(e) => setNewComment(e.target.value)}
-                      placeholder="Write a comment..."
-                      className="border rounded-md px-2 py-1 w-full"
+                      placeholder="Add a comment..."
+                      className="w-full px-4 py-2 border rounded"
                     />
                     <button
-                      className="bg-primary text-white px-3 py-1 rounded-md ml-2"
                       onClick={() => handleComment(post._id)}
+                      className="mt-2 px-4 py-2 text-primary rounded my-auto"
                     >
-                      Post
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="size-6"
+                      >
+                        <path d="M3.478 2.404a.75.75 0 0 0-.926.941l2.432 7.905H13.5a.75.75 0 0 1 0 1.5H4.984l-2.432 7.905a.75.75 0 0 0 .926.94 60.519 60.519 0 0 0 18.445-8.986.75.75 0 0 0 0-1.218A60.517 60.517 0 0 0 3.478 2.404Z" />
+                      </svg>
                     </button>
                   </div>
-                  <div>
-                    <p className="font-bold">{post.comment.length} Comments</p>
-                    {post.comment.map((comment, idx) => (
-                      <div key={idx} className="border-b border-gray-300 py-2">
-                        <strong>{comment.author}:</strong> {comment.comment}
-                        <br />
-                        <small>
-                          {formatDistanceToNow(parseISO(comment.date), {
-                            addSuffix: true,
-                          })}
-                        </small>{" "}
-                        {/* Calculate days ago */}
+                  <div className="commentDiv">
+                    {post.comment.map((commentData, commentIndex) => (
+                      <div
+                        key={commentIndex}
+                        className="border px-3 py-2 my-2 rounded-lg"
+                      >
+                        <div className="flex gap-1">
+                          <p className="font-semibold">{commentData.author}:</p>
+                          <p>{commentData.comment}</p>
+                        </div>
+                        <small className="text-gray-600">
+                          {formatDistanceToNow(parseISO(commentData.date))} ago
+                        </small>
                       </div>
                     ))}
                   </div>
                 </div>
               )}
             </div>
-          ))}
+          )))}
         </div>
       </div>
     </section>

@@ -5,7 +5,7 @@ import { Context } from "../UserContext";
 
 const LoginPage = () => {
   // context
-  // const { setUser } = useContext(Context);
+  const { setUser } = useContext(Context);
 
   // login data state
   const [loginData, setLoginData] = useState({
@@ -17,7 +17,7 @@ const LoginPage = () => {
   const [redirect, setRedirect] = useState(false);
 
   if (redirect) {
-    return <Navigate to={"/"} />;
+    return <Navigate to={"/home"} />;
   }
 
   // store the value to the state
@@ -34,7 +34,7 @@ const LoginPage = () => {
         email: loginData.email,
         password: loginData.password,
       });
-      // setUser(res.data);
+      setUser(res.data);
       alert("Login Successful");
       setRedirect(true);
     } catch (error) {

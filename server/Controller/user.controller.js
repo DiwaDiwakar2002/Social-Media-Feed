@@ -95,10 +95,33 @@ const userLogOut = async (req, res) => {
     }
 };
 
+// getUserList
+const getUserList = async (req, res) => {
+    try {
+        const userDoc = await User.find()
+        res.status(200).json(userDoc);
+    } catch (error) {
+        res.status(500).json("Error in getting user list");
+    }
+}
+
+// delete user
+const userDelete = async (req, res) => {
+    try {
+        const { id } = req.params;
+       await User.findByIdAndDelete(id)
+       res.status(200).json("Deleted Successfully");
+    } catch (error) {
+        res.status(500).json("Error in deleting user list")
+    }
+}
+
 module.exports = {
     createUser,
     createUserLogin,
     getUserInfo,
     userLogOut,
-    userData
+    userData,
+    getUserList,
+    userDelete
 };

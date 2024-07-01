@@ -17,8 +17,8 @@ const App = () => {
     <UserContext>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<FeedPage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route index element={<LoginPage />} />
+          <Route path="/home" element={<FeedPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/account" element={<AcccountPage />} />
         </Route>

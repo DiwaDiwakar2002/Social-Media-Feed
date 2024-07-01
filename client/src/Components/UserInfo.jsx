@@ -29,11 +29,6 @@ const UserInfo = () => {
   return (
     <div className="flex items-center justify-between lg:gap-5 gap-3 bg-white py-5 px-7 rounded-lg">
       <div className="flex gap-2">
-        <img
-          src={userData.profilePath}
-          alt="profile-img"
-          className="w-16 h-16 rounded-full bg-gray-500"
-        />
 
       <div className="my-auto">
         <h2 className="font-bold text-2xl">{userData.name}</h2>

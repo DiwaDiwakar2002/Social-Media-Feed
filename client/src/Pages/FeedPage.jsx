@@ -56,15 +56,28 @@ const FeedPage = () => {
   };
 
   const handleLike = async (postId) => {
+    const isLiked = posts.find((post) => post._id === postId).likes.includes(user.id);
+
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post._id === postId
+          ? {
+              ...post,
+              likes: isLiked
+                ? post.likes.filter((id) => id !== user.id)
+                : [...post.likes, user.id],
+            }
+          : post
+      )
+    );
+
     try {
       const payload = {
         userId: user.id,
       };
-
       const response = await axios.post(`/post-like/${postId}`, payload);
       if (response.status === 200) {
         const updatedPost = response.data.postVO;
-        console.log(updatedPost);
         setPosts((prevPosts) =>
           prevPosts.map((post) => (post._id === postId ? updatedPost : post))
         );
@@ -164,7 +177,7 @@ const FeedPage = () => {
                       className="bg-transparent"
                       onClick={() => handleLike(post._id)}
                     >
-                      {post.likes.includes(post.user) ? (
+                      {post.likes.includes(user.id) ? (
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 24 24"

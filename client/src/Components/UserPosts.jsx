@@ -9,7 +9,7 @@ const UserPosts = () => {
   const [commentingPostId, setCommentingPostId] = useState(null); // Track post id for comment input
   const [likedPosts, setLikedPosts] = useState(new Set()); // Track liked posts
   const [sortOption, setSortOption] = useState("default"); // Track selected sort option
-  const { user, ready } = useContext(Context);
+  const { user } = useContext(Context);
 
   const handleToggleCommentInput = (postId) => {
     setCommentingPostId(postId === commentingPostId ? null : postId);
@@ -26,7 +26,6 @@ const UserPosts = () => {
     try {
       const response = await axios.post(`/add-comments/${postId}`, payloadData);
       if (response.status === 200) {
-        console.log("Comment Posted Successfully");
         setNewComment("");
         setPosts((prevPosts) =>
           prevPosts.map((post) =>
@@ -43,31 +42,33 @@ const UserPosts = () => {
   };
 
   const handleLike = async (postId) => {
+    const isLiked = posts.find((post) => post._id === postId).likes.includes(user.id);
+
+    // Optimistically update the UI
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post._id === postId
+          ? {
+              ...post,
+              likes: isLiked
+                ? post.likes.filter((id) => id !== user.id)
+                : [...post.likes, user.id],
+            }
+          : post
+      )
+    );
+
     try {
-      const isLiked = likedPosts.has(postId);
-      const updatedLikedPosts = new Set(likedPosts);
-
-      if (isLiked) {
-        updatedLikedPosts.delete(postId);
-      } else {
-        updatedLikedPosts.add(postId);
+      const payload = {
+        userId: user.id,
+      };
+      const response = await axios.post(`/post-like/${postId}`, payload);
+      if (response.status === 200) {
+        const updatedPost = response.data.postVO;
+        setPosts((prevPosts) =>
+          prevPosts.map((post) => (post._id === postId ? updatedPost : post))
+        );
       }
-      setLikedPosts(updatedLikedPosts);
-
-      await axios.post(`/post-like/${postId}`, payload);
-
-      setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post._id === postId
-            ? {
-                ...post,
-                likes: isLiked
-                  ? post.likes.filter((id) => id !== user.email)
-                  : [...post.likes, user.email],
-              }
-            : post
-        )
-      );
     } catch (error) {
       console.error("Error handling like:", error);
     }
@@ -205,7 +206,7 @@ const UserPosts = () => {
                     className="bg-transparent"
                     onClick={() => handleLike(post._id)}
                   >
-                    {post.likes.includes(post.user._id) ? (
+                    {post.likes.includes(user.id) ? (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"

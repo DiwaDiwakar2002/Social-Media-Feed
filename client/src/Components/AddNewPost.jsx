@@ -32,7 +32,7 @@ const AddNewPost = ({fetchPosts}) => {
   const handlePost = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(
+     await axios.post(
         "/userpost",
         {
           content,
@@ -42,7 +42,6 @@ const AddNewPost = ({fetchPosts}) => {
           withCredentials: true,
         }
       );
-      console.log("Post created successfully:", res.data);
 
       // Clear input fields after successful post
       setContent("");

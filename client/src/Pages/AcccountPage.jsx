@@ -4,11 +4,9 @@ import UserPosts from "../Components/UserPosts";
 import { Context } from "../UserContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import AdminControl from "../Components/AdminControl";
-import AddNewPost from "../Components/AddNewPost";
 
 const AcccountPage = () => {
   const { user, accountRedirect, ready } = useContext(Context);
-  console.log(user);
   const navigate = useNavigate();
 
   if (!ready) {
@@ -32,7 +30,6 @@ const AcccountPage = () => {
   return (
     <div className="flex flex-col gap-3">
       <UserInfo />
-      <AddNewPost />
       {user.id == "66825172469cbb92854e57db" ? <AdminControl /> : <UserPosts />}
     </div>
   );

@@ -16,7 +16,6 @@ const RegisterPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    console.log("FE : ", formData);
     e.preventDefault();
     try {
       await axios.post("/register", {

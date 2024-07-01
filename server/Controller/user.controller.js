@@ -1,4 +1,5 @@
 const User = require("../Models/user.model.js");
+const Post = require('../Models/post.model.js')
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -109,8 +110,12 @@ const getUserList = async (req, res) => {
 const userDelete = async (req, res) => {
     try {
         const { id } = req.params;
-       await User.findByIdAndDelete(id)
-       res.status(200).json("Deleted Successfully");
+        const user = await User.findByIdAndDelete(id)
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        await Post.deleteMany({ user: id });
+        res.status(200).json("Deleted Successfully");
     } catch (error) {
         res.status(500).json("Error in deleting user list")
     }

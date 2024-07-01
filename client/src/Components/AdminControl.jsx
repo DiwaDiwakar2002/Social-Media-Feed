@@ -24,7 +24,7 @@ const AdminControl = () => {
         await axios.delete(`/user-delete/${id}`);
         fetchUserList();
       } catch (error) {
-        console.log("error in deleting user", error);
+        console.error("error in deleting user", error);
       }
     }
   };
